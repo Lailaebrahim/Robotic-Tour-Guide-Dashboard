@@ -3,14 +3,19 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import AppError from "../utils/error.js";
-import { sendVerificationEmail, sendWelcomeEmail } from "../mail/sendEmails.js";
+import path from "path";
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  sendAccountCompletionEmail,
+} from "../mail/sendEmails.js";
 import {
   generateVerificationToken,
   generateTokensSetCookie,
   generateAccessRefreshToken,
+  generateActivationToken,
 } from "../utils/generateTokens.js";
 import { userRoles, rolePermissions } from "../utils/userRolesPermissions.js";
-
 
 export const signUpUser = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, email, username, password, role } = req.body;
@@ -67,11 +72,14 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new AppError(400, "Invalid verification token"));
   }
+  let activationToken;
   if (
     user.role == userRoles.ROBOT_OPERATOR ||
     user.role == userRoles.TOUR_MANAGER
   ) {
     user.status = "pending";
+    activationToken = generateActivationToken(user);
+    await sendAccountCompletionEmail(user.email, activationToken);
   } else {
     user.status = "active";
     await sendWelcomeEmail(user.email, user.username);
@@ -79,7 +87,43 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   user.verificationToken = undefined;
   user.verificationTokenExpAt = undefined;
   await user.save();
-  res.jsend.success({ message: "Email verified successfully" });
+  res.jsend.success({ message: "Email verified successfully", activationToken: activationToken });
+});
+
+export const accountCompletion = asyncHandler(async (req, res, next) => {
+  const { firstName, lastName, password } = req.body;
+  const activationToken = req.params.token;
+  try {
+    const decodedJWT = jwt.verify(
+      activationToken,
+      process.env.ACTIVATION_TOKEN_SECRET_KEY
+    );
+    const user = await User.findById(decodedJWT._id);
+    if (!user) return next(new AppError(403, "Forbidden No user found"));
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.password = await bcryptjs.hash(password, 10);
+    const profilePath = req.file
+      ? path.join("uploads/userProfile", req.file.filename)
+      : null;
+    if (profilePath) user.profile = profilePath;
+    user.status = "active";
+    await user.save();
+
+    res.jsend.success({
+      message:
+        "Your Account Creation is Completed Successfully! You can login to your account now.",
+    });
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return next(new AppError(401, "Access token expired please login again"));
+    } else {
+      return next(
+        new AppError(403, "Forbidden Invalid activation token: " + err.message)
+      );
+    }
+  }
 });
 
 export const loginUser = asyncHandler(async (req, res, next) => {

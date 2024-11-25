@@ -60,3 +60,28 @@ export const ACCOUNT_VERIFICATION_EMAIL_TEMPLATE =
 </body>
 </html>
 `;
+
+
+export const ACCOUNT_COMPLETION_EMAIL_TEMPLATE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Completion Request</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">Email Verified Next Steps ....</h1>
+  </div>
+  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <p>Your email is verified now you have to complete your account info and create your own password</p>
+    <p>To complete your account creation, click the button below:</p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{accountCompletionURL}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Complete Account Creation</a>
+    </div>
+    <b>Please Note that this url is valid for only 7 days otherwise you will have to request a new one.</b>
+    <p>Best regards,<br>Your Manager</p>
+  </div>
+</body>
+</html>
+`;
