@@ -3,7 +3,7 @@
  */
 import asyncHandler from "express-async-handler";
 import { mailtrapClient, mailtrapSender } from "./mailtrap.config.js";
-import { VERIFICATION_EMAIL_TEMPLATE } from "./emails.templates.js";
+import { VERIFICATION_EMAIL_TEMPLATE, ACCOUNT_VERIFICATION_EMAIL_TEMPLATE } from "./emails.templates.js";
 
 
 export const sendVerificationEmail = asyncHandler(
@@ -46,3 +46,24 @@ export const sendWelcomeEmail = asyncHandler(async (email, username) => {
   };
   await mailtrapClient.send(msg);
 });
+
+export const sendMemberVerificationEmail = asyncHandler(
+  async (username, email, verificationToken) => {
+    const recipients = [
+      {
+        email: email,
+      },
+    ];
+    const msg = {
+      from: mailtrapSender,
+      to: recipients,
+      subject: "Account Verification",
+      html: ACCOUNT_VERIFICATION_EMAIL_TEMPLATE
+      .replace("{verificationToken}", verificationToken)
+      .replace("{username}", username)
+      .replace("{verifyEmailURL}", `${process.env.CLIENT_URL}/verify-email`),
+      category: "Account Verification",
+    };
+    await mailtrapClient.send(msg);
+  }
+);
