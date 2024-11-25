@@ -8,6 +8,8 @@ import {
   sendVerificationEmail,
   sendWelcomeEmail,
   sendAccountCompletionEmail,
+  sendPasswordResetEmail,
+  sendPasswordResetSuccessEmail,
 } from "../mail/sendEmails.js";
 import {
   generateVerificationToken,
@@ -87,7 +89,10 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   user.verificationToken = undefined;
   user.verificationTokenExpAt = undefined;
   await user.save();
-  res.jsend.success({ message: "Email verified successfully", activationToken: activationToken });
+  res.jsend.success({
+    message: "Email verified successfully",
+    activationToken: activationToken,
+  });
 });
 
 export const accountCompletion = asyncHandler(async (req, res, next) => {
@@ -103,7 +108,7 @@ export const accountCompletion = asyncHandler(async (req, res, next) => {
 
     user.firstName = firstName;
     user.lastName = lastName;
-    user.password = await bcryptjs.hash(password, 10);
+    user.password = await bcryptjs.hash(password, parseInt(process.env.SALT));
     const profilePath = req.file
       ? path.join("uploads/userProfile", req.file.filename)
       : null;
@@ -201,4 +206,50 @@ export const logOutUser = asyncHandler(async (req, res, next) => {
   }
   res.clearCookie("JWT");
   res.jsend.success({ message: "Logout successful" });
+});
+
+export const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new AppError(400, "No user found with this email"));
+  }
+  const { accessToken, _ } = generateAccessRefreshToken(user);
+  user.resetPasswordToken = accessToken;
+  user.resetPasswordTokenExpAt =
+    Date.now() + parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRY);
+
+  await user.save();
+
+  await sendPasswordResetEmail(user.email, user.resetPasswordToken);
+
+  res.jsend.success({
+    message: "Password reset email sent successfully",
+    resetPasswordToken: user.resetPasswordToken,
+  });
+});
+
+export const resetPassword = asyncHandler(async (req, res, next) => {
+  const password = req.body.password;
+  const token = req.params.token;
+  if (!password) {
+    return next(new AppError(400, "Password is required"));
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordTokenExpAt: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new AppError(400, "Invalid reset token"));
+  }
+  user.password = await bcryptjs.hash(password, parseInt(process.env.SALT));
+  user.resetPasswordToken = undefined;
+  user.resetPasswordTokenExpAt = undefined;
+
+  await user.save();
+
+  await sendPasswordResetSuccessEmail(user.email);
+
+  res.jsend.success({ message: "Password reset successfully" });
 });

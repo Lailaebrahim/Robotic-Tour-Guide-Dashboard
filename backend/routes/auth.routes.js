@@ -6,6 +6,8 @@ import {
   refreshAccessToken,
   logOutUser,
   accountCompletion,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 import uploadProfileMiddleware from "../utils/memberFileUploads.js";
 
@@ -21,5 +23,7 @@ authRouter.post(
 authRouter.post("/login", loginUser);
 authRouter.get("/refresh-token", refreshAccessToken);
 authRouter.get("/logout", logOutUser);
+authRouter.post("/forgot-password", forgotPassword);
+authRouter.post("/reset-password/:token", resetPassword);
 
 export default authRouter;

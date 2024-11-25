@@ -3,8 +3,13 @@
  */
 import asyncHandler from "express-async-handler";
 import { mailtrapClient, mailtrapSender } from "./mailtrap.config.js";
-import { VERIFICATION_EMAIL_TEMPLATE, ACCOUNT_VERIFICATION_EMAIL_TEMPLATE, ACCOUNT_COMPLETION_EMAIL_TEMPLATE } from "./emails.templates.js";
-
+import {
+  VERIFICATION_EMAIL_TEMPLATE,
+  ACCOUNT_VERIFICATION_EMAIL_TEMPLATE,
+  ACCOUNT_COMPLETION_EMAIL_TEMPLATE,
+  PASSWORD_RESET_REQUEST_TEMPLATE,
+  PASSWORD_RESET_SUCCESS_TEMPLATE,
+} from "./emails.templates.js";
 
 export const sendVerificationEmail = asyncHandler(
   async (email, verificationToken) => {
@@ -58,17 +63,61 @@ export const sendMemberVerificationEmail = asyncHandler(
       from: mailtrapSender,
       to: recipients,
       subject: "Account Verification",
-      html: ACCOUNT_VERIFICATION_EMAIL_TEMPLATE
-      .replace("{verificationToken}", verificationToken)
-      .replace("{username}", username)
-      .replace("{verifyEmailURL}", `${process.env.CLIENT_URL}/verify-email`),
+      html: ACCOUNT_VERIFICATION_EMAIL_TEMPLATE.replace(
+        "{verificationToken}",
+        verificationToken
+      )
+        .replace("{username}", username)
+        .replace("{verifyEmailURL}", `${process.env.CLIENT_URL}/verify-email`),
       category: "Account Verification",
     };
     await mailtrapClient.send(msg);
   }
 );
 
-export const sendAccountCompletionEmail = asyncHandler(async(email, activationToken) => {
+export const sendAccountCompletionEmail = asyncHandler(
+  async (email, activationToken) => {
+    const recipients = [
+      {
+        email: email,
+      },
+    ];
+    const msg = {
+      from: mailtrapSender,
+      to: recipients,
+      subject: "Account Verification",
+      html: ACCOUNT_COMPLETION_EMAIL_TEMPLATE.replace(
+        "{accountCompletionURL}",
+        `${process.env.CLIENT_URL}/complete-account-creation?token=${activationToken}`
+      ),
+      category: "Account Verification",
+    };
+    await mailtrapClient.send(msg);
+  }
+);
+
+export const sendPasswordResetEmail = asyncHandler(
+  async (email, resetToken) => {
+    const recipients = [
+      {
+        email: email,
+      },
+    ];
+    const msg = {
+      from: mailtrapSender,
+      to: recipients,
+      subject: "Reset your password",
+      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace(
+        "{resetURL}",
+        `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`
+      ),
+      category: "Password Reset",
+    };
+    await mailtrapClient.send(msg);
+  }
+);
+
+export const sendPasswordResetSuccessEmail = asyncHandler(async (email) => {
   const recipients = [
     {
       email: email,
@@ -77,9 +126,9 @@ export const sendAccountCompletionEmail = asyncHandler(async(email, activationTo
   const msg = {
     from: mailtrapSender,
     to: recipients,
-    subject: "Account Verification",
-    html: ACCOUNT_COMPLETION_EMAIL_TEMPLATE.replace("{accountCompletionURL}", `${process.env.CLIENT_URL}/complete-account-creation?token=${activationToken}`),
-    category: "Account Verification",
+    subject: "Password reset successful",
+    html: PASSWORD_RESET_SUCCESS_TEMPLATE,
+    category: "Password Reset",
   };
   await mailtrapClient.send(msg);
-})
+});
