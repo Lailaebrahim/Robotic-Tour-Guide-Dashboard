@@ -11,6 +11,7 @@ import express from "express";
 import dotenv from "dotenv";
 import jsend from "jsend";
 import cookieParser from "cookie-parser";
+import errorHandler from "./middlewares/error/errorHandler.js";
 
 // express application instance
 const app = express();
@@ -22,6 +23,7 @@ dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
 app.use(jsend.middleware);
+app.use(errorHandler);
 
 // route handler for undefined routes
 app.use("*", (_, res) => {
