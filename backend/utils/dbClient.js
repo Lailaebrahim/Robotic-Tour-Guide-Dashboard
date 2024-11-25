@@ -24,10 +24,7 @@ class DBClient {
      */
     async connect() {
         try {
-            this.connection = await mongoose.connect(this.uri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-            });
+            this.connection = await mongoose.connect(this.uri);
             console.log('MongoDB connected successfully');
         } catch (error) {
             console.error(`MongoDB connection error: ${error}`);

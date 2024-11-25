@@ -25,7 +25,6 @@ dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
 app.use(jsend.middleware);
-app.use(errorHandler);
 
 // routes
 app.use("/api/auth", authRouter);
@@ -34,6 +33,9 @@ app.use("/api/auth", authRouter);
 app.use("*", (_, res) => {
   res.status(404).jsend.fail({ message: "Url Not Found" });
 });
+
+// error handler
+app.use(errorHandler);
 
 // starts the server and listens on the specified port
 app.listen(process.env.PORT || 5000, () => {

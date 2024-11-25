@@ -19,18 +19,20 @@
  */
 import asyncHandler from 'express-async-handler';
 
-const errorHandler = asyncHandler(async (error, _, res) => {
+const errorHandler = (error, req, res, next) => {
     if (error.statusCode >= 400 && error.statusCode < 500) {
-        res.status(error.statusCode || 400).jsend.fail({
-          message: error.message || "A client error has occurred.",
+      res.status(error.statusCode || 400).jsend.fail({
+        message: error.message || "Client Error",
+        details: error.details || null,
+      });
+    } else {
+      res
+        .status(error.statusCode || 500)
+        .jsend.error({
+          message: error.message || "Internal Server Error",
           details: error.details || null,
         });
-    } else {
-        res.status(error.statusCode || 500).jsend.error({
-            message: error.message || "An internal server error has occurred.",
-            details: error.details || null,
-        });
     }
-});
+  };
 
 export default errorHandler;
