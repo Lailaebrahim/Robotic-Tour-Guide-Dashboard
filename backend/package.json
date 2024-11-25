@@ -9,6 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/Lailaebrahim/Robotic-Tour-Guide-Dashboard.git"
   },
+  "type": "module",
   "author": "Laila Ebrahim",
   "license": "ISC",
   "bugs": {
