@@ -34,7 +34,7 @@ export const generateAccessRefreshToken = (user) => {
 
 
 export const generateTokensSetCookie = (user, res) => {
-  const { refreshToken, accessToken } = generateTokens(user);
+  const { refreshToken, accessToken } = generateAccessRefreshToken(user);
   res.cookie("JWT", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

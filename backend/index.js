@@ -13,6 +13,7 @@ import jsend from "jsend";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error/errorHandler.js";
 import DBClient from "./utils/dbClient.js";
+import authRouter from "./routes/auth.routes.js";
 
 // express application instance
 const app = express();
@@ -25,6 +26,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(jsend.middleware);
 app.use(errorHandler);
+
+// routes
+app.use("/api/auth", authRouter);
 
 // route handler for undefined routes
 app.use("*", (_, res) => {
