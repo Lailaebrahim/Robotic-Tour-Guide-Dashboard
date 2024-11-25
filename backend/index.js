@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 import jsend from "jsend";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error/errorHandler.js";
+import DBClient from "./utils/dbClient.js";
 
 // express application instance
 const app = express();
@@ -33,4 +34,5 @@ app.use("*", (_, res) => {
 // starts the server and listens on the specified port
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
+  new DBClient();
 });
