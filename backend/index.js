@@ -13,8 +13,10 @@ import jsend from "jsend";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error/errorHandler.js";
 import DBClient from "./utils/dbClient.js";
+import rosController from "./utils/rosClient.js";
 import authRouter from "./routes/auth.routes.js";
 import adminRouter from "./routes/admin.routes.js";
+import robotRouter from "./routes/robot.routes.js";
 
 // express application instance
 const app = express();
@@ -30,6 +32,7 @@ app.use(jsend.middleware);
 // routes
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/robot", robotRouter);
 
 // route handler for undefined routes
 app.use("*", (_, res) => {
@@ -42,5 +45,13 @@ app.use(errorHandler);
 // starts the server and listens on the specified port
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
-  new DBClient();
+ new DBClient();
+  // initialize connection
+  (async () => {
+    try {
+      await rosController.connect();
+    } catch (error) {
+      console.error("Initial connection failed:", JSON.stringify(error.message));
+    }
+  })();
 });
