@@ -11,7 +11,7 @@ class DBClient {
      * to establish a connection.
      */
     constructor() {
-        this.uri = process.env.DB_URI;
+        this.uri = process.env.MONGODB_URI;
         this.connection = null;
         this.connect();
     }
