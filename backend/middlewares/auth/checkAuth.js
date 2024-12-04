@@ -22,7 +22,7 @@ import User from '../../models/user.model.js';
 const isAuth = asyncHandler(async (req, _ , next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-        return next(new AppError(401, "Unauthorized No AUTH header"));
+        return next(new AppError(401, "Unauthorized No Auth header"));
     }
     const accessToken = authHeader.split(" ")[1];
     if (!accessToken) {
@@ -41,7 +41,7 @@ const isAuth = asyncHandler(async (req, _ , next) => {
         next();
     } catch(err){
         if (err.name === 'TokenExpiredError') {
-            return next(new AppError(401, "Token expired, please refresh the access token"));
+            return next(new AppError(401, "TokenExpiredError"));
         } else {
             return next(new AppError(403, err.message));
         }
