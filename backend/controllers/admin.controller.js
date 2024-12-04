@@ -5,7 +5,6 @@ import { rolePermissions, userRoles } from "../utils/userRolesPermissions.js";
 import { generateVerificationToken } from "../utils/generateTokens.js";
 import { sendMemberVerificationEmail } from "../mail/sendEmails.js";
 
-
 export const createNewMember = asyncHandler(async (req, res, next) => {
   const { email, username, role } = req.body;
   const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -36,15 +35,33 @@ export const createNewMember = asyncHandler(async (req, res, next) => {
   );
 
   res.status(201).jsend.success({
-    message:
-      "New member created and verfication email is sent to them successfully",
-    email: user.email,
-    username: user.username,
-    status: user.status,
-    role: user.role,
-    verificationToken: user.verificationToken,
-    verificationTokenExpAt: user.verificationTokenExpAt,
+    message: `Team Member ${user.username} created successfully. Verification email sent to ${user.email}`,
   });
+});
+
+export const updateMember = asyncHandler(async (req, res, next) => {
+  const userId = req.params.userId;
+  const { email, username } = req.body;
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new AppError(404, "Team Member not found"));
+  }
+  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+  if (existingUser) {
+    const error = new AppError(400);
+    if (existingUser.email == email) {
+      error.message = new AppError(400, "Duplicate Email! ");
+    } else {
+      error.message = new AppError(400, "Duplicate Username !");
+    }
+    return next(error);
+  }
+  if (email) user.email = email;
+  if (username) user.username = username;
+  await user.save();
+  res
+    .status(200)
+    .jsend.success({ message: "Team Member updated successfully" });
 });
 
 export const getTeam = asyncHandler(async (req, res, next) => {
@@ -102,7 +119,11 @@ export const giveControl = asyncHandler(async (req, res, next) => {
   user.hasControl = true;
   await user.save();
 
-  res.status(200).jsend.success({ message: `Robot Operator ${user.username}  has control now` });
+  res
+    .status(200)
+    .jsend.success({
+      message: `Robot Operator ${user.username}  has control now`,
+    });
 });
 
 export const revokeControl = asyncHandler(async (req, res, next) => {
@@ -117,7 +138,10 @@ export const revokeControl = asyncHandler(async (req, res, next) => {
 
   if (!user.hasControl) {
     return next(
-      new AppError(400, `Robot Operator ${user.username} already doesn't have control`)
+      new AppError(
+        400,
+        `Robot Operator ${user.username} already doesn't have control`
+      )
     );
   }
 
@@ -126,7 +150,9 @@ export const revokeControl = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .jsend.success({ message: `Robot Operator ${user.username}  doesn't have control now.` });
+    .jsend.success({
+      message: `Robot Operator ${user.username}  doesn't have control now.`,
+    });
 });
 
 export const deleteMember = asyncHandler(async (req, res, next) => {
