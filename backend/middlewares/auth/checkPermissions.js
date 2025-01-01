@@ -16,6 +16,7 @@ const checkPermission = (requiredPermission) => {
 
         const userPermissions = user.permissions;
         if (userPermissions.includes(requiredPermission)) {
+          req.user = user;
           next();
         } else {
           res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
