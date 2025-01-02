@@ -8,22 +8,26 @@ import {
   accountCompletion,
   forgotPassword,
   resetPassword,
+  checkAuth
 } from "../controllers/auth.controller.js";
+import {signUpValidator, loginValidator, completeAccountValidator} from "../middlewares/validators/authValidators.js";
 import uploadProfileMiddleware from "../utils/memberFileUploads.js";
+import isAuth from "../middlewares/auth/checkAuth.js";
 
 const authRouter = Router();
 
-authRouter.post("/signup", signUpUser);
 authRouter.post("/verify-email", verifyEmail);
 authRouter.post(
   "/complete-registration/:token",
+  completeAccountValidator,
   uploadProfileMiddleware,
   accountCompletion
 );
-authRouter.post("/login", loginUser);
+authRouter.post("/login", loginValidator, loginUser);
 authRouter.get("/refresh-token", refreshAccessToken);
-authRouter.get("/logout", logOutUser);
+authRouter.get("/logout", isAuth, logOutUser);
 authRouter.post("/forgot-password", forgotPassword);
 authRouter.post("/reset-password/:token", resetPassword);
+authRouter.get("/check-auth", isAuth, checkAuth);
 
 export default authRouter;
