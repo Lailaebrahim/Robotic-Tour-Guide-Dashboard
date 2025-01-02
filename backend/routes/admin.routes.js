@@ -6,12 +6,16 @@ import {
   giveControl,
   revokeControl,
   deleteMember,
+  updateMember,
 } from "../controllers/admin.controller.js";
 import isAuth from "../middlewares/auth/checkAuth.js";
 import checkPermission from "../middlewares/auth/checkPermissions.js";
 import { PERMISSIONS } from "../utils/userRolesPermissions.js";
+import checkId from "../middlewares/validators/checkId.js";
 
 const adminRouter = Router();
+
+adminRouter.param("id", checkId);
 
 adminRouter.post(
   "/create-member",
@@ -19,6 +23,7 @@ adminRouter.post(
   checkPermission(PERMISSIONS.USERS.CREATE),
   createNewMember
 );
+
 adminRouter.get(
   "/team",
   isAuth,
@@ -26,25 +31,31 @@ adminRouter.get(
   getTeam
 );
 adminRouter.get(
-  "/member/:userId",
+  "/member/:id",
   isAuth,
   checkPermission(PERMISSIONS.USERS.READ),
   getMember
 );
 adminRouter.patch(
-  "/give-control/:userId",
+  "/member/:id",
+  isAuth,
+  checkPermission(PERMISSIONS.USERS.UPDATE),
+  updateMember
+);
+adminRouter.patch(
+  "/give-control/:id",
   isAuth,
   checkPermission(PERMISSIONS.USERS.CONTROL),
   giveControl
 );
 adminRouter.patch(
-  "/revoke-control/:userId",
+  "/revoke-control/:id",
   isAuth,
   checkPermission(PERMISSIONS.USERS.CONTROL),
   revokeControl
 );
 adminRouter.delete(
-  "/member/:userId",
+  "/member/:id",
   isAuth,
   checkPermission(PERMISSIONS.USERS.DELETE),
   deleteMember
