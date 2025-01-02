@@ -3,6 +3,8 @@ import {
   getConnectionStatus,
   getTopics,
   readClientsCount,
+  sendGeneratedAudio,
+  startTour
 } from "../controllers/robot.controller.js";
 import isAuth from "../middlewares/auth/checkAuth.js";
 import checkPermission from "../middlewares/auth/checkPermissions.js";
@@ -28,6 +30,18 @@ robotRouter.get(
   isAuth,
   checkPermission(PERMISSIONS.ROBOT.READ),
   readClientsCount
+);
+robotRouter.get(
+  "/send-generated-audio",
+  isAuth,
+  checkPermission(PERMISSIONS.ROBOT.WRITE),
+  sendGeneratedAudio
+);
+robotRouter.get(
+  "/start-tour/:id",
+  isAuth,
+  checkPermission(PERMISSIONS.ROBOT.CONTROL),
+  startTour
 );
 
 export default robotRouter;
