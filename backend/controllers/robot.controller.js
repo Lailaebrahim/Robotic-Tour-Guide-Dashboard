@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler";
 import rosController from "../utils/rosClient.js";
 import AppError from "../utils/error.js";
-
+import Tour from "../models/tour.model.js";
 
 export const getConnectionStatus = asyncHandler(async (req, res) => {
   res.status(200).jsend.success({
@@ -33,7 +33,7 @@ export const getTopics = asyncHandler(async (req, res, next) => {
   }
 });
 
-export const readClientsCount = asyncHandler(async (req, res) => {
+export const readClientsCount = asyncHandler(async (req, res, next) => {
   if (rosController.isAuthenticated) {
     try {
       const clientsCountSubscriber = rosController.createTopic(
@@ -64,4 +64,79 @@ export const readClientsCount = asyncHandler(async (req, res) => {
   } else {
     return next(new AppError(401, "Not Auth to ROS"));
   }
+});
+
+export const sendGeneratedAudio = asyncHandler(async (req, res, next) => {
+  if (rosController.isAuthenticated) {
+    try {
+      const audioPath =
+        "/home/lailaebrahim/Robotic-Tour-Guide-Dashboard/trails/received_audio/1.wav";
+      await rosController.streamAudioFile(audioPath);
+      res.status(200).jsend.success({ message: "Audio sent" });
+    } catch (error) {
+      res.status(500).jsend.error({
+        message: "Failed to send audio",
+        error: error.message,
+      });
+    }
+  } else {
+    return next(new AppError(401, "Not Auth to ROS"));
+  }
+});
+
+export const startTour = asyncHandler(async (req, res, next) => {
+  const tourId = req.params.id;
+
+  // check if tour exists
+  const tour = await Tour.findById(tourId);
+  if (!tour) {
+    return next(new AppError(404, "Tour not found"));
+  }
+
+  // check if audio is generated
+  if (
+    !tour.isAudioGenerated &&
+    !Object.values(tour.museumMap).every((poi) => poi.audio != null)
+  ) {
+    return next(new AppError(400, "Generate Tour Audio First!"));
+  }
+
+  // check ROS connection & authentication
+  if (!rosController.isAuthenticated) {
+    return next(new AppError(401, "Not Authorized to ROS"));
+  }
+
+  // check robot state
+  if (rosController.state !== "at home") {
+    return next(
+      new AppError(400, "Can't Start A New Tour While Robot Not At Home")
+    );
+  }
+
+  console.log("all checks passed, starting tour");
+
+  // get all POI audios paths
+  const audios = Object.values(tour.museumMap).map((poi) => process.env.PUBLIC_DIR_PATH + poi.audio);
+
+  console.log(audios);
+
+  // send audios sequentially
+  for (const audio of audios.slice(0, 1)) {
+    const result = await rosController.streamAudioFile(audio);
+    if (result instanceof Error) {
+      return next(new AppError(500, `Failed to send audio: ${result.message}`));
+    }
+  }
+
+  // if all audios were sent successfully
+  const startResult = await rosController.sendStartTourSignal();
+
+  res.status(200).json({
+    status: "success",
+    message: "Tour started successfully",
+    data: {
+      tourId: tour._id,
+      numberOfPOIs: audios.length,
+    },
+  });
 });
