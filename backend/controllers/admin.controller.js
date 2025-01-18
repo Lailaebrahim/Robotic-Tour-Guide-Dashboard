@@ -40,9 +40,9 @@ export const createNewMember = asyncHandler(async (req, res, next) => {
 });
 
 export const updateMember = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
+  const id = req.params.id;
   const { email, username } = req.body;
-  const user = await User.findById(userId);
+  const user = await User.findById(id);
   if (!user) {
     return next(new AppError(404, "Team Member not found"));
   }
@@ -79,8 +79,8 @@ export const getTeam = asyncHandler(async (req, res, next) => {
 });
 
 export const getMember = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
-  const member = await User.findById(userId).select("-password");
+  const id = req.params.id;
+  const member = await User.findById(id).select("-password");
   if (!member) {
     return next(new AppError(404, "Team member not found"));
   }
@@ -88,10 +88,10 @@ export const getMember = asyncHandler(async (req, res, next) => {
 });
 
 export const giveControl = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
+  const id = req.params.id;
   const user = await User.findOne({
     role: userRoles.ROBOT_OPERATOR,
-    _id: userId,
+    _id: id,
   });
   if (!user) {
     return next(new AppError(404, "Robot Operator not found"));
@@ -107,7 +107,7 @@ export const giveControl = asyncHandler(async (req, res, next) => {
   const userHasControl = await User.findOne({
     role: userRoles.ROBOT_OPERATOR,
     hasControl: true,
-    _id: { $ne: userId },
+    _id: { $ne: id },
   });
 
   if (userHasControl) {
@@ -127,10 +127,10 @@ export const giveControl = asyncHandler(async (req, res, next) => {
 });
 
 export const revokeControl = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
+  const id = req.params.id;
   const user = await User.findOne({
     role: userRoles.ROBOT_OPERATOR,
-    _id: userId,
+    _id: id,
   });
   if (!user) {
     return next(new AppError(404, "Operator not found"));
@@ -156,8 +156,8 @@ export const revokeControl = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteMember = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
-  const user = await User.findById(userId);
+  const id = req.params.id;
+  const user = await User.findById(id);
   if (!user) {
     return next(new AppError(404, "Team Member not found"));
   }
