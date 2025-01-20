@@ -37,8 +37,8 @@ export const generateTokensSetCookie = (user, res) => {
   const { refreshToken, accessToken } = generateAccessRefreshToken(user);
   res.cookie("JWT", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: true,
+    sameSite: "None",
     maxAge: parseInt(process.env.AUTH_COOKIE_MAX_AGE),
   });
   return {refreshToken, accessToken};

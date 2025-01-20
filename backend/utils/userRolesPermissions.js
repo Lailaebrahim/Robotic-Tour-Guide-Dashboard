@@ -11,6 +11,7 @@ const userRoles = Object.freeze({
     TOUR_MANAGER: "tourManager",
     ROBOT_OPERATOR: "robotOperator",
     CONTENT_MANAGER: "contentManager",
+    USER: "user",
 });
 
 const PERMISSIONS = Object.freeze({
@@ -50,7 +51,8 @@ const rolePermissions = Object.freeze({
       ...Object.values(PERMISSIONS.ROBOT),
       PERMISSIONS.USERS.READ,
       PERMISSIONS.TOURS.READ,
-  ]
+  ],
+  [userRoles.USER]: [],
 });
 
 export { userRoles, rolePermissions, PERMISSIONS };
