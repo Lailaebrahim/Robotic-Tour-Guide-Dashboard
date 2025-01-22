@@ -43,6 +43,35 @@ const stateConfigs = {
     icon: Coffee,
     text: "at home",
   },
+  "moving forward": {
+    colors: "from-yellow-500 to-yellow-800",
+    icon: DirectionsRun,
+    text: "moving forward",
+    animate: "animate-bounce",
+  },
+  "moving left": {
+    colors: "from-yellow-500 to-yellow-800",
+    icon: DirectionsRun,
+    text: "moving left",
+    animate: "animate-bounce",
+  },
+  "moving right": {
+    colors: "from-yellow-500 to-yellow-800",
+    icon: DirectionsRun,
+    text: "moving right",
+    animate: "animate-bounce",
+  },
+  "moving backward": {
+    colors: "from-yellow-500 to-yellow-800",
+    icon: DirectionsRun,
+    text: "moving backward",
+    animate: "animate-bounce",
+  },
+  "moving stop": {
+    colors: "from-green-500 to-green-800",
+    icon: Coffee,
+    text: "stopped",
+  },
 };
 
 const RobotState = ({

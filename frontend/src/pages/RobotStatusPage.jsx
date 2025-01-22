@@ -5,7 +5,8 @@ import Header from "../components/header";
 import MotionButton from "../components/MotionButton";
 import robotStore from "../store/robotStore";
 import userAuthStore from "../store/authStore";
-import Map from "../components/Map";
+// import TeleoperationPanel from "../components/TeleoperationPanel";
+import AmclPoseDisplay from "../components/RobotPosition";
 import RobotStatus from "../components/RobotState";
 import { ArrowDown, Volume2 } from "lucide-react";
 import tourStore from "../store/tourStore";
@@ -13,13 +14,22 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { Start } from "@mui/icons-material";
 import TourDisplay from "../components/TourDisplay";
+import MoveRobot from "../components/MoveRobot";
 // import { Helmet } from "react-helmet";
 
 const RobotStatusPage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { isLoading, isConnected, checkConnection, isAuth, state, startTour } =
-    robotStore();
+  const {
+    isLoading,
+    isConnected,
+    checkConnection,
+    isAuth,
+    state,
+    startTour,
+    position,
+    sendMoveCommand,
+  } = robotStore();
   const { user, isAuthenticated } = userAuthStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const { tours, getTours, generateTourAudio } = tourStore();
@@ -69,7 +79,7 @@ const RobotStatusPage = () => {
     <Box m="20px">
       <Header title="Robot Status" subtitle="" />
       <RobotStatus
-        currentState={state}
+        currentState={state || "at home"}
         isLoading={isLoading}
         isConnected={isConnected}
         isAuth={isAuth}
@@ -154,8 +164,34 @@ const RobotStatusPage = () => {
         </Box>
       </Box>
 
-      <Box mt="40px">
-        <Map />
+      <Box
+        mt="40px"
+        width={"100%"}
+        padding="30px"
+        display="grid"
+        gridTemplateColumns="1fr 1fr"
+        sx={{
+          border: "2px solid grey",
+        }}
+        gap="100px"
+      >
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+          height="100%"
+        >
+          <Box>
+            <AmclPoseDisplay position={position} />
+          </Box>
+        </Box>
+        <Box>
+          <MoveRobot sendMoveCommand={sendMoveCommand} />
+        </Box>
+
+        {/* <Box>
+          <TeleoperationPanel />
+        </Box> */}
       </Box>
     </Box>
   );

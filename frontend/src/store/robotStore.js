@@ -15,7 +15,11 @@ const robotStore = create((set, get) => ({
   error: null,
   state: null,
   socket: null,
-  position: null,
+  position: {
+    x: 0,
+    y: 0,
+    yaw: 0,
+  },
 
   // WebSocket Actions
   connectWebSocket: () => {
@@ -41,10 +45,17 @@ const robotStore = create((set, get) => ({
         case "amcl_pose": {
           set({
             position: {
-              x: data.data.x,
-              y: data.data.y,
-              z: data.data.z,
-              w: data.data.w,
+              x: data.pose.pose.position.x,
+              y: data.pose.pose.position.y,
+              yaw: Math.atan2(
+                2 *
+                  (data.pose.pose.position.w * data.pose.pose.position.z +
+                    data.pose.pose.position.x * data.pose.pose.position.y),
+                1 -
+                  2 *
+                    (data.pose.pose.position.y * data.pose.pose.position.y +
+                      data.pose.pose.position.z * data.pose.pose.position.z)
+              ),
             },
           });
           break;
@@ -90,16 +101,17 @@ const robotStore = create((set, get) => ({
     }
   },
 
-  // Send message through WebSocket
-  sendCommand: (command) => {
+  // Send move command through WebSocket
+  sendMoveCommand: (moveCommand) => {
     const { socket } = get();
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(
         JSON.stringify({
-          type: "command",
-          data: command,
+          type: "moveCommand",
+          data: moveCommand,
         })
       );
+      set({ state: `moving ${moveCommand}` });
     } else {
       set({ error: "WebSocket not connected" });
     }
@@ -154,7 +166,7 @@ const robotStore = create((set, get) => ({
       throw new Error(errorMessage);
     }
   },
-  
+
   // Cleanup
   cleanup: () => {
     get().disconnectWebSocket();
