@@ -66,4 +66,13 @@ const server = app.listen(process.env.PORT || 5000, () => {
 export const wss = new WebSocketServer.Server({ server });
 wss.on('connection', (ws) => {
   console.log('New frontend client connected');
+  ws.on('close', () => {
+    console.log('Frontend client disconnected');
+  });
+  ws.on('message', async (message) => {
+    const parsedMessage = JSON.parse(message);
+    if (parsedMessage.type === 'moveCommand') {
+      await rosController.sendMoveCommand(parsedMessage.data);
+    }
+  });
 });

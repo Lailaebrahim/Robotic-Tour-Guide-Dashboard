@@ -1,0 +1,79 @@
+{
+    "_id": {
+      "$oid": "676156e12e80765581107136"
+    },
+    "title": "Japanese History Tour",
+    "description": "Group of Japanese university students studying ancient civilizations, particularly interested in comparing Egyptian and Asian architectural techniques. They're fascinated by the pyramids' construction methods and want to explore the similarities between Egyptian and ancient Japanese burial practices. The group includes archaeology students who specifically requested to see the mummification exhibits and hieroglyphic writing systems.",
+    "groupAvgAge": 22,
+    "start": {
+      "$date": "2024-12-17T09:00:00.000Z"
+    },
+    "duration": 60,
+    "end": {
+      "$date": "2024-12-17T10:00:00.000Z"
+    },
+    "allDay": false,
+    "maxGroupSize": 20,
+    "language": "Japanese",
+    "isAudioGenerated": true,
+    "museumMap": {
+      "POI_1": {
+        "name": "Ancient Engineering Marvels",
+        "description": "Exhibition showcasing the engineering and architectural achievements of ancient Egyptians. Features detailed models of construction techniques, tools, and architectural plans. Includes comparative displays of ancient engineering across civilizations.",
+        "position": {
+          "pose": {
+            "position": {
+              "x": 12.3,
+              "y": 28.7
+            },
+            "orientation": {
+              "z": 0.866,
+              "w": 0.5
+            }
+          }
+        },
+        "audio": "/tours_audio/676156e12e80765581107136/1.wav"
+      },
+      "POI_2": {
+        "name": "Mummification Chamber",
+        "description": "Detailed exhibition of the mummification process, featuring actual mummified remains, canopic jars, and the tools used in the process. Includes information about religious beliefs surrounding death and preservation.",
+        "position": {
+          "pose": {
+            "position": {
+              "x": 25.4,
+              "y": 35.6
+            },
+            "orientation": {
+              "z": 0.707,
+              "w": 0.707
+            }
+          }
+        },
+        "audio": "/tours_audio/676156e12e80765581107136/2.wav"
+      },
+      "POI_3": {
+        "name": "Hieroglyphics Study Center",
+        "description": "Interactive display of Egyptian writing systems, featuring the Rosetta Stone replica and examples of different types of hieroglyphic inscriptions. Includes hands-on area for practicing hieroglyphic writing.",
+        "position": {
+          "pose": {
+            "position": {
+              "x": 38.9,
+              "y": 42.1
+            },
+            "orientation": {
+              "z": 0.383,
+              "w": 0.924
+            }
+          }
+        },
+        "audio": "/tours_audio/676156e12e80765581107136/3.wav"
+      }
+    },
+    "createdBy": {
+        "$oid": "672fb196431eeab3e59dbecf"
+      },
+      "createdAt": {
+        "$date": "2024-12-14T18:23:51.715Z"
+      },
+      "__v": 0
+  }

@@ -16,6 +16,7 @@ import isAuth from "../middlewares/auth/checkAuth.js";
 
 const authRouter = Router();
 
+// authRouter.post("/signup", signUpValidator, signUpUser);
 authRouter.post("/verify-email", verifyEmail);
 authRouter.post(
   "/complete-registration/:token",

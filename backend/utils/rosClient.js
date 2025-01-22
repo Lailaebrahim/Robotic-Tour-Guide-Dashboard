@@ -23,7 +23,7 @@ class ROSController {
   constructor() {
     this.ros = new ROS.Ros();
     this.connectionAttempts = 0;
-    this.maxReconnectAttempts = 10;
+    this.maxReconnectAttempts = 100;
     this.reconnectInterval = 5000;
     this.isReconnecting = false;
     this.isAuthenticated = false;
@@ -54,6 +54,7 @@ class ROSController {
         }
         console.log("Successfully authenticated with ROS");
         this.stateSubscriber();
+        this.amclPoseSubscriber();
       } catch (error) {
         console.error("Authentication failed:", error);
         this.ros.close();
@@ -351,6 +352,29 @@ class ROSController {
     return state;
   }
 
+  async amclPoseSubscriber() {
+    const amclPoseSubscriber = new ROS.Topic({
+      ros: this.ros,
+      name: "/amcl_pose",
+      messageType: "geometry_msgs/PoseWithCovarianceStamped"
+    });
+    const pose = await new Promise((resolve, reject) => {
+      amclPoseSubscriber.subscribe((message) => {
+        console.log("Received AMCL Pose:", message);
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({ type: "amcl_pose", data: message.data })
+            );
+          }
+        });
+        resolve(message);
+      });
+    });
+
+    return pose;
+  }
+
   async sendStartTourSignal() {
     return new Promise((resolve, reject) => {
       // publisher for start signal
@@ -400,6 +424,59 @@ class ROSController {
       }
     });
   }
+
+  /* to be continued */
+  // async sendGoToCommand(POI) {
+  //   const cmd_vel_publisher = new ROS.Topic({
+  //     ros: this.ros,
+  //     name: "/cmd_vel",
+  //     messageType: "geometry_msgs/PoseWithCovarianceStamped"
+  //   });
+
+  //   const message = new ROS.Message({
+  //     data: POI
+  //   });
+
+  // }
+
+  async sendMoveCommand(command) {
+    console.log("Received move command:", command);
+    // const cmd_vel_publisher = new ROS.Topic({
+    //       ros: this.ros,
+    //       name: "/cmd_vel",
+    //       messageType: "geometry_msgs/PoseWithCovarianceStamped"
+    //     });
+
+    //     let message;
+    //     switch (command) {
+    //       case "forward":
+    //         message = new ROS.Message({});
+    //         break;
+    //       case "backward":
+    //         message = new ROS.Message({});
+    //         break;
+    //       case "left":
+    //         message = new ROS.Message({});
+    //         break;
+    //       case "right":
+    //         message = new ROS.Message({});
+    //         break;
+    //       case "stop":
+    //         message = new ROS.Message({});
+    //         break;
+    //       default:
+    //         console.log("Invalid command");
+    //         break;
+    //     }
+
+    //     try {
+    //       cmd_vel_publisher.publish(message);
+    //     } catch (error) {
+    //       console.error("Failed to send move command:", error);
+    //     }
+
+  }
+
 }
 
 const rosController = new ROSController();
