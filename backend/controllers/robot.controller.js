@@ -116,12 +116,17 @@ export const startTour = asyncHandler(async (req, res, next) => {
   console.log("all checks passed, starting tour");
 
   // get all POI audios paths
-  const audios = Object.values(tour.museumMap).map((poi) => process.env.PUBLIC_DIR_PATH + poi.audio);
+  const audios = Object.values(tour.museumMap).map((poi) => {
+    const dirPath = fileURLToPath(dirname(import.meta.url));
+    const outputFilePath = join(dirPath, `../../../${process.env.PUBLIC_PATH}/${poi.audio}`);
+    return outputFilePath;
+  });
 
   console.log(audios);
 
   // send audios sequentially
-  for (const audio of audios.slice(0, 1)) {
+  for (const audio of audios) {
+    console.log(audio);
     const result = await rosController.streamAudioFile(audio);
     if (result instanceof Error) {
       return next(new AppError(500, `Failed to send audio: ${result.message}`));

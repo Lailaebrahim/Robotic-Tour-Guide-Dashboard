@@ -23,7 +23,7 @@ class ROSController {
   constructor() {
     this.ros = new ROS.Ros();
     this.connectionAttempts = 0;
-    this.maxReconnectAttempts = 100;
+    this.maxReconnectAttempts = 2;
     this.reconnectInterval = 5000;
     this.isReconnecting = false;
     this.isAuthenticated = false;

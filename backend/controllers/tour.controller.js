@@ -1,9 +1,12 @@
 import asyncHandler from "express-async-handler";
 import AppError from "../utils/error.js";
 import Tour from "../models/tour.model.js";
+import { join, dirname } from "path";
+import path from "path";
+import { readFileSync, writeFile, mkdirSync } from "fs";
+import { fileURLToPath } from "url";
+import extractPublicPath from "../utils/extractPublicPath.js"
 import axios from "axios";
-
-
 
 export const getTours = asyncHandler(async (req, res) => {
   const { start, end, page = 1, limit = 10 } = req.query;
@@ -129,24 +132,68 @@ export const getTourById = asyncHandler(async (req, res, next) => {
   res.status(200).jsend.success({ tour });
 });
 
-// to be completed
 export const generateTourAudio = asyncHandler(async (req, res, next) => {
   const tourId = req.params.id;
   const tour = await Tour.findById(tourId);
   if (!tour) {
     return next(new AppError(404, "Tour not found"));
   }
-  const tourDescription = `Title: ${tour.title}.\nDescription: ${tour.description}\nLanguage: ${tour.language}\nGroup Average Age: ${tour.groupAvgAge} year \nGroup Size: ${tour.maxGroupSize} \nDuration: ${tour.duration} \nStart Date: ${tour.start} \nEnd Date: ${tour.end} \nTour Map:\n${Object.entries(tour.museumMap)
-    .map(([poi, val]) => `${poi}: Artifact: ${val.name}\nDescription: ${val.description} \n`)
-    .join('\n')}`;
-  console.log(tourDescription);
+  const tourDescription = `Title: ${tour.title}.\nDescription: ${tour.description
+    }\nLanguage: ${tour.language}\nGroup Average Age: ${tour.groupAvgAge
+    } year \nGroup Size: ${tour.maxGroupSize} \nDuration: ${tour.duration
+    } \nStart Date: ${tour.start} \nEnd Date: ${tour.end
+    } \nTour Map:\n${Object.entries(tour.museumMap)
+      .map(
+        ([poi, val]) =>
+          `${poi}: Artifact: ${val.name}\nDescription: ${val.description} \n`
+      )
+      .join("\n")}`;
+
   try {
-    const ai_res = await axios.post(`${process.env.AI_API_URL}/refine-scripts`, {
-      user_input: tourDescription,
-    });
-    // supposed to take the returned audio file and save path of it to the tour object
-    tour.isAudioGenerated = true;
-    res.status(200).jsend.success({ message: "Audio generated successfully !", tour });
+    console.log("Generating audio for tour with id:", tourId);
+
+    const ai_res = await axios.post(`${process.env.AI_API_GET_AUDIO_FILES}`);
+
+    if (ai_res.status == 200) {
+
+      let file = 1;
+
+      console.log(ai_res.status);
+
+      for (const [filename, base64Data] of Object.entries(ai_res.data)) {
+        const buffer = Buffer.from(base64Data.replace(/^data:audio\/\w+;base64,/, ''), 'base64');
+        const dirPath = fileURLToPath(dirname(import.meta.url));
+        const outputFilePath = join(dirPath, `../../${process.env.PUBLIC_PATH}/tours_audio/${tourId}/${file}.mp3`);
+        console.log(`Saving ${outputFilePath}`);
+        try {
+          await writeFile(outputFilePath, buffer, (err) => {
+            if (err) throw err;
+          });
+          console.log(`Saved ${outputFilePath}`);
+          tour.museumMap[`POI_${file}`].audio = extractPublicPath(outputFilePath);
+          file++;
+        } catch (error) {
+          console.log(`Error saving ${outputFilePath} ${error.message}`);
+          return next(new AppError(500, `Error saving audio ${error.message}`));
+        }
+
+      }
+
+      tour.isAudioGenerated = true;
+      console.log(tour);
+
+      await tour.save();
+
+    } else {
+      return next(
+        new AppError(500, `Error generating audio ${ai_res.data.error}`)
+      );
+    }
+
+    res
+      .status(200)
+      .jsend.success({ message: "Audio generated successfully !", tour });
+
   } catch (error) {
     return next(new AppError(500, `Error generating audio ${error.message}`));
   }

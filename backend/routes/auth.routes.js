@@ -18,12 +18,7 @@ const authRouter = Router();
 
 // authRouter.post("/signup", signUpValidator, signUpUser);
 authRouter.post("/verify-email", verifyEmail);
-authRouter.post(
-  "/complete-registration/:token",
-  completeAccountValidator,
-  uploadProfileMiddleware,
-  accountCompletion
-);
+authRouter.post("/complete-registration/:token", completeAccountValidator, uploadProfileMiddleware, accountCompletion);
 authRouter.post("/login", loginValidator, loginUser);
 authRouter.get("/refresh-token", refreshAccessToken);
 authRouter.get("/logout", isAuth, logOutUser);
