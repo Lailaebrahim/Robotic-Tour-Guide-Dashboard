@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
 import { Loader } from "lucide-react";
+import tourStore from "../store/tourStore";
+import robotStore from "../store/robotStore";
+import { Volume2 } from "lucide-react";
+import { Stream } from "@mui/icons-material";
 
 const MotionButton = ({
   isLoading,
@@ -12,12 +16,28 @@ const MotionButton = ({
   className = "",
   type = "button",
 }) => {
-  if (isLoading) {
-    return <Loader className="animate-spin mx-auto" size={24} />;
-  }
-
   const baseClassName =
     "mt-5 w-full py-3 px-4 font-bold rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 text-center flex items-center justify-center space-x-2";
+
+  const { isLoading: isTourLoading } = tourStore();
+  const { isLoading: isRobotLoading } = robotStore();
+
+  if (
+    (Icon1 === Volume2 && isTourLoading) ||
+    (Icon1 === Stream && isRobotLoading)
+  ) {
+    return (
+      <motion.button
+        type={type}
+        onClick={onClick}
+        className={`${baseClassName} ${className} bg-gray-500 hover:bg-gray-600 cursor-not-allowed`}
+        disabled
+      >
+        <Loader className="animate-spin" size={24} color="white" />
+        <span className="text-white">Loading...</span>
+      </motion.button>
+    );
+  }
 
   if (bool) {
     return (

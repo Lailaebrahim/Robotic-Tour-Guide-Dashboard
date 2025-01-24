@@ -18,7 +18,7 @@ const LogInPage = () => {
       if (res instanceof Error) {
         throw new Error(res.message);
       }
-      navigate("/dashboard");
+      navigate("/dashboard/robot-status");
     } catch (error) {
       console.log(error.message);
     }

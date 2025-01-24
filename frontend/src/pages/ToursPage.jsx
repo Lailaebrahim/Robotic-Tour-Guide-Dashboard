@@ -24,8 +24,9 @@ import { motion } from "framer-motion";
 import { Loader, EditIcon, DeleteIcon } from "lucide-react";
 import { Info, Users, Clock, Globe, PenTool } from "lucide-react";
 import toast from "react-hot-toast";
-import { combineDateTimeToUTC } from "../utils/timeZone";
+// import { combineDateTimeToUTC } from "../utils/timeZone";
 import { useNavigate } from "react-router-dom";
+import moment from "moment-timezone";
 // import { Dropdown } from "react-native-element-dropdown";
 
 const ToursPage = () => {
@@ -163,13 +164,20 @@ const ToursPage = () => {
 
   const handleCreateTour = async (e) => {
     e.preventDefault();
-    const tourDate = new Date(combineDateTimeToUTC(startDate, startTime));
+    console.log(startDate, startTime);
+    const cairoMoment = moment.tz(startDate, "Africa/Cairo");
+    const utcMoment = cairoMoment.clone().utc();
+    const endMoment = utcMoment.clone().add(duration, "minutes");
+    // const tourDate = new Date(combineDateTimeToUTC(startDate, startTime));
+    // tourDate.setHours(tourDate.getHours() - 2);
+    console.log(utcMoment);
+    console.log(endMoment);
     const tourData = {
       title,
       description,
       groupAvgAge,
-      start: tourDate,
-      end: new Date(tourDate.getTime() + duration * 60000).toISOString(),
+      start: utcMoment.format(),
+      end: endMoment.format(),
       duration,
       maxGroupSize,
       language: language || "English",
@@ -350,7 +358,7 @@ const ToursPage = () => {
                   .slice(0, 8)
                   .map((tour) => (
                     <ListItem
-                      key={tour.id}
+                      key={tour._id}
                       sx={{
                         backgroundColor: colors.blueAccent[700],
                         margin: "10px 0",
@@ -453,6 +461,7 @@ const ToursPage = () => {
                 onChange={(e) => setLanguage(e.target.value)}
                 options={[
                   { value: "English", label: "English" },
+                  { value: "Arabic", label: "Arabic" },
                   { value: "Spanish", label: "Spanish" },
                   { value: "French", label: "French" },
                   { value: "German", label: "German" },

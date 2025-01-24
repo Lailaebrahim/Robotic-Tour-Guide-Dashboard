@@ -2,10 +2,12 @@
 import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
+import robotStore from "../store/robotStore";
 
-const AmclPoseDisplay = (position) => {
+const AmclPoseDisplay = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { position } = robotStore();
 
   return (
     <Box>

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
+import { RepeatRounded, Stream } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import Header from "../components/header";
 import MotionButton from "../components/MotionButton";
 import robotStore from "../store/robotStore";
 import userAuthStore from "../store/authStore";
 // import TeleoperationPanel from "../components/TeleoperationPanel";
-import AmclPoseDisplay from "../components/RobotPosition";
+import AmclPoseDisplay from "../components/AmclPoseDisplay";
 import RobotStatus from "../components/RobotState";
 import { ArrowDown, Volume2 } from "lucide-react";
 import tourStore from "../store/tourStore";
@@ -27,11 +28,10 @@ const RobotStatusPage = () => {
     isAuth,
     state,
     startTour,
-    position,
-    sendMoveCommand,
+    streamAudio,
   } = robotStore();
   const { user, isAuthenticated } = userAuthStore();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const { tours, getTours, generateTourAudio } = tourStore();
 
   useEffect(() => {
@@ -39,8 +39,8 @@ const RobotStatusPage = () => {
   }, [isConnected]);
 
   useEffect(() => {
-    const start = new Date().toISOString().split("T")[0] + "T07:00:00.000Z";
-    const end = new Date().toISOString().split("T")[0] + "T19:00:00.000Z";
+    const start = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+    const end = new Date().toISOString().split("T")[0] + "T24:00:00.000Z";
     getTours(start, end);
   }, [isExpanded]);
 
@@ -63,17 +63,31 @@ const RobotStatusPage = () => {
     }
   };
 
-  //
   const handleTourStart = async (tourId) => {
     try {
       console.log("Starting tour with id:", tourId);
       const res = await startTour(tourId);
       console.log(res);
-      toast.success("Tour started successfully !");
+      toast.success("Tour Started successfully !");
     } catch (error) {
       toast.error(error.message);
     }
   };
+
+  const handleAudioStream = async (tourId) => {
+    try {
+      await streamAudio(tourId);
+      toast.success("Audio Streamed successfully !");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const start = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+    const end = new Date().toISOString().split("T")[0] + "T23:59:59.999Z";
+    getTours(start, end);
+  }, []);
 
   return (
     <Box m="20px">
@@ -136,26 +150,57 @@ const RobotStatusPage = () => {
               >
                 <TourDisplay tour={tour} />
 
-                <Box display="flex" justifyContent="center" alignItems="center">
-                  {tour.isAudioGenerated ? (
-                    user.hasControl ? (
-                      <MotionButton
-                        isLoading={false}
-                        bool={true}
-                        title1="Start Tour"
-                        Icon1={Start}
-                        type="button"
-                        onClick={() => handleTourStart(tour._id)}
-                      />
-                    ) : null
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  gap="20px"
+                >
+                  {/* Condition for users with control */}
+                  {tour.isAudioGenerated && user.hasControl ? (
+                    <>
+                      {tour.isAudioStreamed ? (
+                        <MotionButton
+                          isLoading={isLoading}
+                          bool={true}
+                          title1="Start Tour"
+                          Icon1={Start}
+                          type="button"
+                          onClick={() => handleTourStart(tour._id)}
+                        />
+                      ) : (
+                        <>
+                          <MotionButton
+                            isLoading={isLoading}
+                            bool={true}
+                            title1="Stream Audios"
+                            Icon1={Stream}
+                            type="button"
+                            onClick={() => handleAudioStream(tour._id)}
+                          />
+                          <MotionButton
+                            isLoading={isLoading}
+                            bool={true}
+                            title1="Regenerate Audios"
+                            Icon1={RepeatRounded}
+                            type="button"
+                            onClick={() => handleAudioGeneration(tour._id)}
+                          />
+                        </>
+                      )}
+                    </>
                   ) : (
-                    <MotionButton
-                      isLoading={isLoading}
-                      bool={true}
-                      title1="Generate Audio"
-                      Icon1={Volume2}
-                      onClick={() => handleAudioGeneration(tour._id)}
-                    />
+                    // Condition for users without control or when audio is not generated
+                    !tour.isAudioGenerated && (
+                      <MotionButton
+                        isLoading={isLoading}
+                        bool={true}
+                        title1="Generate Audio"
+                        Icon1={Volume2}
+                        type="button"
+                        onClick={() => handleAudioGeneration(tour._id)}
+                      />
+                    )
                   )}
                 </Box>
               </Box>
@@ -182,11 +227,11 @@ const RobotStatusPage = () => {
           height="100%"
         >
           <Box>
-            <AmclPoseDisplay position={position} />
+            <AmclPoseDisplay />
           </Box>
         </Box>
         <Box>
-          <MoveRobot sendMoveCommand={sendMoveCommand} />
+          <MoveRobot />
         </Box>
 
         {/* <Box>

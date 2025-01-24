@@ -9,6 +9,7 @@ import {
   Error,
   Lock,
   LockOpen,
+  Home,
 } from "@mui/icons-material";
 import MotionButton from "./MotionButton";
 import PropTypes from "prop-types";
@@ -40,7 +41,7 @@ const stateConfigs = {
   },
   AtHome: {
     colors: "from-green-500 to-green-800",
-    icon: Coffee,
+    icon: Home,
     text: "at home",
   },
   "moving forward": {

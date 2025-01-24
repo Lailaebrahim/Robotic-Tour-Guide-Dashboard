@@ -96,7 +96,6 @@ const tourStore = create((set) => ({
                 return {tours: events, error: null, isLoading: false};
             });
         } catch (error) {
-            console.log(error.message);
             const errorMessage = error.response?.data?.data?.message || 'Internal Server Error';
             set({error: errorMessage, isLoading: false});
             return new Error(errorMessage);
@@ -124,7 +123,6 @@ const tourStore = create((set) => ({
                 isLoading: false
             }));
         } catch (error) {
-            console.log(error);
             const errorMessage = error.response.data.message || error.message || 'Internal Server Error';
             set({error: errorMessage, isLoading: false});
             throw new Error(errorMessage);

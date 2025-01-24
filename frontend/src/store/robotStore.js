@@ -49,12 +49,12 @@ const robotStore = create((set, get) => ({
               y: data.pose.pose.position.y,
               yaw: Math.atan2(
                 2 *
-                  (data.pose.pose.position.w * data.pose.pose.position.z +
-                    data.pose.pose.position.x * data.pose.pose.position.y),
+                (data.pose.pose.position.w * data.pose.pose.position.z +
+                  data.pose.pose.position.x * data.pose.pose.position.y),
                 1 -
-                  2 *
-                    (data.pose.pose.position.y * data.pose.pose.position.y +
-                      data.pose.pose.position.z * data.pose.pose.position.z)
+                2 *
+                (data.pose.pose.position.y * data.pose.pose.position.y +
+                  data.pose.pose.position.z * data.pose.pose.position.z)
               ),
             },
           });
@@ -145,8 +145,29 @@ const robotStore = create((set, get) => ({
   },
 
   //
+  stremAudio: async (tourId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await axios.get(
+        `${API_URL}/robot/send-generated-audio/${tourId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      set({ isLoading: false, error: null });
+      return response.data.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.data?.message || "Internal Server Error";
+      set({ error: errorMessage, isLoading: false });
+      throw new Error(errorMessage);
+    }
+  },
   startTour: async (tourId) => {
-    // set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null });
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(
@@ -166,7 +187,6 @@ const robotStore = create((set, get) => ({
       throw new Error(errorMessage);
     }
   },
-
   // Cleanup
   cleanup: () => {
     get().disconnectWebSocket();
