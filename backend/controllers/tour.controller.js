@@ -170,7 +170,12 @@ export const generateTourAudio = asyncHandler(async (req, res, next) => {
             if (err) throw err;
           });
           console.log(`Saved ${outputFilePath}`);
-          tour.museumMap[`POI_${file}`].audio = extractPublicPath(outputFilePath);
+          // tour.museumMap[`POI_${file}`].audio = extractPublicPath(outputFilePath);
+          const poiKey = `POI_${file}`;
+          if (!tour.museumMap.get(poiKey)) {
+            tour.museumMap.set(poiKey, { name: '', description: '' });
+          }
+          tour.museumMap.get(poiKey).audio = extractPublicPath(outputFilePath);
           file++;
         } catch (error) {
           console.log(`Error saving ${outputFilePath} ${error.message}`);

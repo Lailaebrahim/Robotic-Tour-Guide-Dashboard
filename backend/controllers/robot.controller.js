@@ -70,8 +70,11 @@ export const sendGeneratedAudio = asyncHandler(async (req, res, next) => {
   if (rosController.isAuthenticated) {
     try {
       const audioPath =
-        "/home/lailaebrahim/Robotic-Tour-Guide-Dashboard/trails/received_audio/1.wav";
+        "/home/lailaebrahim/Robotic-Tour-Guide-Dashboard/trails/received_audio/received_audio/1.wav";
       await rosController.streamAudioFile(audioPath);
+      const tour = await Tour.findById(req.params.id);
+      tour.isAudioStreamed = true;
+      await tour.save();
       res.status(200).jsend.success({ message: "Audio sent" });
     } catch (error) {
       res.status(500).jsend.error({

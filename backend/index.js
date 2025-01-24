@@ -52,7 +52,7 @@ app.use(errorHandler);
 // starts the server and listens on the specified port
 const server = app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
- new DBClient();
+  new DBClient();
   // initialize connection
   (async () => {
     try {

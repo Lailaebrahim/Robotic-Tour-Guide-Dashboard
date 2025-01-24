@@ -32,7 +32,7 @@ robotRouter.get(
   readClientsCount
 );
 robotRouter.get(
-  "/send-generated-audio",
+  "/send-generated-audio/:id",
   isAuth,
   checkPermission(PERMISSIONS.ROBOT.WRITE),
   sendGeneratedAudio

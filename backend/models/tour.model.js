@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import museumMap from "../utils/museumMap.js";
+import isAuth from "../middlewares/auth/checkAuth.js";
 
 const tourSchema = new mongoose.Schema(
     {
@@ -11,7 +12,7 @@ const tourSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        groupAvgAge:{
+        groupAvgAge: {
             type: Number,
             required: true
         },
@@ -23,11 +24,11 @@ const tourSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        end:{
+        end: {
             type: Date,
             required: true,
         },
-        allDay:{
+        allDay: {
             type: Boolean,
             default: false
         },
@@ -39,11 +40,15 @@ const tourSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        museumMap:{
+        museumMap: {
             type: Object,
             default: museumMap
         },
         isAudioGenerated: {
+            type: Boolean,
+            default: false
+        },
+        isAudioStreamed: {
             type: Boolean,
             default: false
         },
@@ -56,7 +61,7 @@ const tourSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-});
+    });
 
 
 export default mongoose.model("Tour", tourSchema);
