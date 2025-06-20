@@ -10,8 +10,28 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/material": "^7.1.2",
+    "@mui/x-data-grid": "^8.5.3",
+    "axios": "^1.10.0",
+    "caniuse-lite": "^1.0.30001684",
+    "framer-motion": "^12.18.1",
+    "lucide-react": "^0.518.0",
+    "moment-timezone": "^0.6.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.5.2",
+    "react-pro-sidebar": "^1.1.0",
+    "react-router-dom": "^7.6.2",
+    "roslib": "^1.4.1",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
