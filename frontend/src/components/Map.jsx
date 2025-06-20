@@ -1,16 +1,16 @@
-import React from "react";
+import rosController from "../utils/rosClient";
 
 const Map = () => {
-  // console.log(ROS2D.Viewer);
-  // var viewer = new ROS2D.Viewer({
-  //   divID: "map",
-  //   width: 600,
-  //   height: 500,
-  // });
+  const handleElementMount = (ele) => {
+    if (ele) {
+      // eslint-disable-next-line no-unused-vars
+      const { viewer, navClient } = rosController.createMapViewer();
+    }
+  };
 
   return (
     <div>
-      <div id="map"></div>
+      <div ref={handleElementMount} id="map"></div>
     </div>
   );
 };

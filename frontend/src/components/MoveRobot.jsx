@@ -13,16 +13,20 @@ const MoveRobot = () => {
   const { sendMoveCommand, isLoading, isConnected } = robotStore();
   const { isLoading: isTourLoading } = tourStore();
 
-  const getButtonClasses = (isStopButton = false) => {
+  const getButtonClasses = (isStopButton = false, isHomeButton = false) => {
     let classes =
       "w-full p-4 text-white rounded-lg flex items-center justify-center";
 
     if (isLoading || isTourLoading || !isConnected) {
       classes += " opacity-50 cursor-not-allowed";
     } else {
-      classes += isStopButton
-        ? " bg-red-500 hover:bg-red-600"
-        : " bg-blue-500 hover:bg-blue-600";
+      if (isStopButton) {
+        classes += " bg-red-500 hover:bg-red-600";
+      } else if (isHomeButton) {
+        classes += " bg-green-500 hover:bg-green-600";
+      } else {
+        classes += " bg-blue-500 hover:bg-blue-600";
+      }
     }
 
     return classes;
@@ -73,6 +77,15 @@ const MoveRobot = () => {
           disabled={isLoading}
         >
           <ChevronDown size={24} />
+        </button>
+      </Box>
+      <Box className="col-span-3 mt-4">
+        <button
+          className={getButtonClasses(false, true)}
+          onClick={() => sendMoveCommand("home")}
+          disabled={isLoading}
+        >
+          🏠 Home
         </button>
       </Box>
     </Box>

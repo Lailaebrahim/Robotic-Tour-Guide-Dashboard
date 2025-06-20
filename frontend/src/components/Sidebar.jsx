@@ -201,7 +201,7 @@ const SideBar = () => {
             />
             <Item
               title="ChatBot"
-              to="/chatbot"
+              to="http://localhost:3000/"
               icon={<ChatOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

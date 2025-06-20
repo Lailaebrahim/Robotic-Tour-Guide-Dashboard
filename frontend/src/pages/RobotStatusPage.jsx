@@ -16,7 +16,7 @@ import { tokens } from "../theme";
 import { Start } from "@mui/icons-material";
 import TourDisplay from "../components/TourDisplay";
 import MoveRobot from "../components/MoveRobot";
-// import { Helmet } from "react-helmet";
+import Map from "../components/Map";
 
 const RobotStatusPage = () => {
   const theme = useTheme();
@@ -28,7 +28,7 @@ const RobotStatusPage = () => {
     isAuth,
     state,
     startTour,
-    streamAudio,
+    stremAudio,
   } = robotStore();
   const { user, isAuthenticated } = userAuthStore();
   const [isExpanded, setIsExpanded] = useState(true);
@@ -76,7 +76,7 @@ const RobotStatusPage = () => {
 
   const handleAudioStream = async (tourId) => {
     try {
-      await streamAudio(tourId);
+      await stremAudio(tourId);
       toast.success("Audio Streamed successfully !");
     } catch (error) {
       toast.error(error.message);
@@ -232,6 +232,9 @@ const RobotStatusPage = () => {
         </Box>
         <Box>
           <MoveRobot />
+        </Box>
+        <Box>
+          <Map />
         </Box>
 
         {/* <Box>
